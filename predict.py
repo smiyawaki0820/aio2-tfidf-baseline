@@ -4,6 +4,8 @@ import json
 import os
 import pickle
 
+from densifiers import DensifierForSparseVector
+
 
 def main(args):
     # load the processed train dataset and the question vectors
@@ -16,12 +18,20 @@ def main(args):
     question_vectors_file = os.path.join(args.model_dir, "question_vectors.pickle")
     train_question_vectors = pickle.load(open(question_vectors_file, "rb"))
 
+    if args.use_densifier:
+        densifier = DensifierForSparseVector()
+        max_Ds, idx_Ds = densifier.densify(train_question_vectors, n_slices=768)
+
     # load each item in the test dataset and predict its answer
     with open(args.test_file) as f, open(args.prediction_file, "w") as fo:
         for line in f:
             item = json.loads(line)
             test_question_vector = question_vectorizer.transform([item["question"]])
-            tfidf_scores = train_question_vectors.dot(test_question_vector.toarray().T)[:, None]
+            if args.use_densifier:
+                max_Q, idx_Q = densifier.densify(test_question_vector[0], n_slices=768)
+                tfidf_scores = densifier.retrieval_and_reranking(max_Q, idx_Q, max_Ds, idx_Ds)
+            else:
+                tfidf_scores = train_question_vectors.dot(test_question_vector.toarray().T)[:, None]
             top_score_index = tfidf_scores.argmax().item()
             pred_answer = train_dataset[top_score_index]["answers"][0]
 
@@ -33,5 +43,6 @@ if __name__ == "__main__":
     parser.add_argument("--model_dir", type=str, required=True, help="Directory of trained model and data files.")
     parser.add_argument("--test_file", type=str, required=True, help="Input test dataset file.")
     parser.add_argument("--prediction_file", type=str, required=True, help="Output prediction file.")
+    parser.add_argument("--use_densifier", action="store_true", help="Use if DSRs")
     args = parser.parse_args()
     main(args)

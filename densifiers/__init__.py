@@ -1,5 +1,5 @@
-from os import path.dirname
+from os.path import dirname
 import sys
 
-sys.path.append(path.dirname(__file__))
+sys.path.append(dirname(__file__))
 from densify_sparse_representations import DensifierForSparseVector
