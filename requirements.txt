@@ -1,3 +1,7 @@
 fugashi==1.1.1
 ipadic==1.0.0
 scikit-learn==1.0.1
+
+# add
+overrides==6.1.0
+pandas==1.4.1

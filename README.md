@@ -32,7 +32,8 @@ $ python train.py \
 $ python predict.py \
 --model_dir model \
 --test_file <data dir>/aio_02_dev_unlabeled_v1.0.jsonl \
---prediction_file <output dir>/predictions.jsonl
+--prediction_file <output dir>/predictions.jsonl \
+--use_densifier    # if use
 ```
 
 ## Building Docker image
