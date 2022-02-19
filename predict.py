@@ -20,7 +20,7 @@ def main(args):
 
     if args.use_densifier:
         densifier = DensifierForSparseVector()
-        max_Ds, idx_Ds = densifier.densify(train_question_vectors, n_slices=768)
+        max_Ds, idx_Ds = densifier.densify(train_question_vectors.toarray(), n_slices=768)
 
     # load each item in the test dataset and predict its answer
     with open(args.test_file) as f, open(args.prediction_file, "w") as fo:
@@ -28,8 +28,8 @@ def main(args):
             item = json.loads(line)
             test_question_vector = question_vectorizer.transform([item["question"]])
             if args.use_densifier:
-                max_Q, idx_Q = densifier.densify(test_question_vector[0], n_slices=768)
-                tfidf_scores = densifier.retrieval_and_reranking(max_Q, idx_Q, max_Ds, idx_Ds)
+                max_Q, idx_Q = densifier.densify(test_question_vector.toarray(), n_slices=768)
+                tfidf_scores = densifier.retrieval_and_reranking(max_Q[0], idx_Q[0], max_Ds, idx_Ds)
             else:
                 tfidf_scores = train_question_vectors.dot(test_question_vector.toarray().T)[:, None]
             top_score_index = tfidf_scores.argmax().item()

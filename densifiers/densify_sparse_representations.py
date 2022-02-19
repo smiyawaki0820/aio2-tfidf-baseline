@@ -22,8 +22,8 @@ class DensifierForSparseVector(object):
         return "https://arxiv.org/abs/2112.04666"
 
     @staticmethod
-    def slice(X, n_slices, how):
-        v = X.shape[1]
+    def slice(sparse_vector, n_slices, how):
+        v = sparse_vector.shape[1]
         m = n_slices           # num of slices
         n = math.ceil(v / m)   # each dim
         X = np.pad(sparse_vector, ((0, 0), (0, m*n-v)))
